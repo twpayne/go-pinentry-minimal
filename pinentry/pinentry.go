@@ -14,9 +14,6 @@ import (
 	"regexp"
 	"strconv"
 	"time"
-
-	"github.com/rs/zerolog"
-	"go.uber.org/multierr"
 )
 
 // Options.
@@ -76,7 +73,6 @@ type Client struct {
 	commands    []string
 	process     Process
 	qualityFunc QualityFunc
-	logger      *zerolog.Logger
 }
 
 // A ClientOption sets an option on a Client.
@@ -137,13 +133,6 @@ func WithError(err string) ClientOption {
 // WithKeyInfo sets a stable key identifier for use with password caching.
 func WithKeyInfo(keyInfo string) ClientOption {
 	return WithCommandf("SETKEYINFO %s", escape(keyInfo))
-}
-
-// WithLogger sets the logger.
-func WithLogger(logger *zerolog.Logger) ClientOption {
-	return func(c *Client) {
-		c.logger = logger
-	}
 }
 
 // WithNoGlobalGrab instructs pinentry to only grab the password when the window
@@ -235,7 +224,7 @@ func NewClient(options ...ClientOption) (c *Client, err error) {
 
 	defer func() {
 		if err != nil {
-			err = multierr.Append(err, c.Close())
+			_ = c.Close()
 		}
 	}()
 
@@ -255,13 +244,15 @@ func NewClient(options ...ClientOption) (c *Client, err error) {
 		}
 	}
 
-	return c, nil
+	return
 }
 
 // Close closes the connection to the pinentry process.
 func (c *Client) Close() (err error) {
 	defer func() {
-		err = multierr.Append(err, c.process.Close())
+		if err2 := c.process.Close(); err == nil {
+			err = err2
+		}
 	}()
 	if err = c.writeLine("BYE"); err != nil {
 		return
@@ -349,9 +340,6 @@ func (c *Client) readLine() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		if c.logger != nil {
-			c.logger.Err(err).Bytes("line", line).Msg("readLine")
-		}
 		switch {
 		case isBlank(line):
 		case isComment(line):
@@ -378,9 +366,6 @@ func (c *Client) readOK() error {
 // writeLine writes a single line.
 func (c *Client) writeLine(line string) error {
 	_, err := c.process.Write([]byte(line + "\n"))
-	if c.logger != nil {
-		c.logger.Err(err).Str("line", line).Msg("write")
-	}
 	return err
 }
 

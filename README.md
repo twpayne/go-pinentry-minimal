@@ -1,15 +1,17 @@
-# go-pinentry
+# go-pinentry-minimal
 
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/twpayne/go-pinentry)](https://pkg.go.dev/github.com/twpayne/go-pinentry)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/twpayne/go-pinentry-minimal)](https://pkg.go.dev/github.com/twpayne/go-pinentry-minimal)
 
-Package `pinentry` provides a client to [GnuPG's
-pinentry](https://www.gnupg.org/related_software/pinentry/index.html).
+Package `pinentry` provides a minimal client to [GnuPG's
+pinentry](https://www.gnupg.org/related_software/pinentry/index.html), which
+only depends on Go's standard library. It is a fork of
+[`github.com/twpayne/go-pinentry`](https://github.com/twpayne/go-pinentry).
 
 ## Key Features
 
 * Support for all `pinentry` features.
 * Idiomatic Go API.
-* Well tested.
+* Forked from a well-tested library.
 
 ## Example
 
@@ -37,16 +39,6 @@ pinentry](https://www.gnupg.org/related_software/pinentry/index.html).
 		fmt.Printf("PIN: %s\n", pin)
 	}
 ```
-
-## Comparison with related packages
-
-Compared to
-[`github.com/gopasspw/pinentry`](https://github.com/gopasspw/pinentry), this
-package:
-* Implements all `pinentry` features.
-* Includes tests.
-* Implements a full parser of the underlying Assuan protocol for better
-  compatibility with all `pinentry` implementations.
 
 ## License
 
